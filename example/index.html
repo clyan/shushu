@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TA数据上报demo</title>
+    <!--Thinking Analytics SDK BEGIN-->
+    <link rel="stylesheet" href="./ta_js_sdk/css/index.css" />
+    <!--Thinking Analytics SDK BEGIN-->
+    <script src="../lib/thinkingdata.umd.min.js"></script>
+    <script>
+      console.log(thinkingdata);
+      // 创建 SDK 配置对象
+      var config = {
+        appId: "debug-appid",
+        serverUrl: "https://ta-receiver.tomatogames.com",
+      };
+
+      // 将 SDK 实例赋给全局变量 ta，或者其他您指定的变量
+      window.ta = thinkingdata;
+
+      // 用配置对象初始化 SDK
+      ta.init(config);
+
+      // 之后您就可以使用 ta 来上报事件了
+      ta.track("shushu_sdk");
+    </script>
+    <!--Thinking Analytics SDK END-->
+    <!-- <script>
+      !(function (e) {
+        if (!window.ThinkingDataAnalyticalTool) {
+          var n = e.sdkUrl,
+            t = e.name,
+            r = window,
+            a = document,
+            i = "script",
+            l = null,
+            s = null;
+          r.ThinkingDataAnalyticalTool = t;
+          var o = [
+            "track",
+            "quick",
+            "login",
+            "identify",
+            "logout",
+            "trackLink",
+            "userSet",
+            "userSetOnce",
+            "userAdd",
+            "userDel",
+            "setPageProperty",
+            "setSuperProperties",
+            "setDynamicSuperProperties",
+            "clearSuperProperties",
+            "timeEvent",
+            "unsetSuperProperties",
+            "initInstance",
+            "trackFirstEvent",
+            "trackUpdate",
+            "trackOverwrite",
+          ];
+          r[t] = function (e) {
+            return function () {
+              if (this.name)
+                (r[t]._q = r[t]._q || []).push([e, arguments, this.name]);
+              else if ("initInstance" === e) {
+                var n = arguments[0];
+                r[t][n] = { name: n };
+                for (var a = 0; a < o.length; a++)
+                  r[t][n][o[a]] = r[t].call(r[t][n], o[a]);
+                (r[t]._q1 = r[t]._q1 || []).push([e, arguments]);
+              } else (r[t]._q = r[t]._q || []).push([e, arguments]);
+            };
+          };
+          for (var u = 0; u < o.length; u++) r[t][o[u]] = r[t].call(null, o[u]);
+          (r[t].param = e),
+            (r[t].__SV = 1.1),
+            (l = a.createElement(i)),
+            (s = a.getElementsByTagName(i)[0]),
+            (l.async = 1),
+            (l.src = n),
+            s.parentNode.insertBefore(l, s);
+        }
+      })({
+        appId: "debug-appid", //系统分配的APPID
+        name: "ta", //全局的调用变量名，可以任意设置，后续的调用使用该名称即可
+        sdkUrl: "./ta_js_sdk/js/thinkingdata.min.js", //统计脚本URL
+        serverUrl: "https://ta-receiver.tomatogames.com", //数据上传的URL
+        loaded: function (ta) {
+          // var currentId = ta.getDistinctId();
+          // ta.identify(currentId);
+          // ta.quick('autoTrack');
+        },
+      });
+    </script> -->
+    <!--Thinking Analytics SDK END-->
+  </head>
+  <body>
+    <div class="home">
+      <div class="nav">TA（数数）数据接入DEMO</div>
+      <div class="content">
+        <button onclick="uploadTrack()">上传测试事件</button>
+        <div class="link">
+          <a target="_blank" href="https://ta.tomatogames.com/#/tga/event/-1"
+            >去TA平台查看账号</a
+          >
+        </div>
+        <button class="public" onclick="setPublicProperty()">
+          设置公共属性
+        </button>
+        <div class=""></div>
+        <button onclick="getdistinctId()">获取访客ID</button>
+        <div class="guest"></div>
+        <button onclick="testLogin()">登录</button>
+        <div class="login"></div>
+        <button onclick="logout()">退出</button>
+      </div>
+    </div>
+    <script>
+      // 登录
+      function testLogin() {
+        // 用户的登录唯一标识，此数据对应上报数据里的 #account_id，此时 "#account_id" 的值为"ABC_123456"
+        ta.login("guest_95820948503");
+        document.getElementsByClassName("login")[0].innerText =
+          "guest_95820948503";
+      }
+      function setPublicProperty() {
+        ta.setPageProperty({
+          network_type: getNetworkType(),
+          time: new Date().getTime(),
+          ua: navigator.userAgent,
+        });
+      }
+      // 上传时间
+      function uploadTrack() {
+        // 示例事件
+        // web_wbqj_xjds_add_login_users	累积登录人数		我本千金-戏精的诞生H5
+        ta.track(
+          "web_wbqj_click_test" //追踪事件的名称 - 我本千金-戏精的诞生H5
+        );
+      }
+
+      // 获取访客ID
+      function getdistinctId() {
+        //返回访客 ID，多实例的情况下，返回的是调用实例的访客ID
+        var distinctId = ta.getDistinctId();
+        document.getElementsByClassName("guest")[0].innerText = distinctId;
+      }
+
+      // 清除账号ID
+      function logout() {
+        // 去除上报数据里的 #account_id，之后的数据将不带有 "#account_id"
+        ta.logout();
+      }
+      // 获取网络类型
+      function getNetworkType() {
+        var ua = navigator.userAgent;
+        var networkStr = ua.match(/NetType\/\w+/)
+          ? ua.match(/NetType\/\w+/)[0]
+          : "NetType/other";
+        networkStr = networkStr.toLowerCase().replace("nettype/", "");
+        var networkType;
+        switch (networkStr) {
+          case "wifi":
+            networkType = "wifi";
+            break;
+          case "5g":
+            networkType = "5g";
+            break;
+          case "4g":
+            networkType = "4g";
+            break;
+          case "3g":
+            networkType = "3g";
+            break;
+          case "3gnet":
+            networkType = "3g";
+            break;
+          case "2g":
+            networkType = "2g";
+            break;
+          default:
+            networkType = "other";
+        }
+        return networkStr;
+      }
+    </script>
+  </body>
+</html>
